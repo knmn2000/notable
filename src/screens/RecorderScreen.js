@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 
-const App = () => {
+const RecorderScreen = props => {
   const screenWidth = Dimensions.get('screen').width;
   const dirs = RNFetchBlob.fs.dirs;
   const path = Platform.select({
@@ -356,4 +356,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default RecorderScreen;

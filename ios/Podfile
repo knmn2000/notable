@@ -21,6 +21,8 @@ target 'notable' do
 
   pod 'RNAudioRecorderPlayer', :path => '../node_modules/react-native-audio-recorder-player'
 
+  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+
   target 'notableTests' do
     inherit! :complete
     # Pods for testing
