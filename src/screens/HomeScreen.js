@@ -1,9 +1,14 @@
+import React, {useState, useEffect} from 'react';
 import {View, Text, Pressable} from 'react-native';
+
 import {FAB, Input, Button, BottomSheet, Overlay, Divider} from '@rneui/base';
-import ListItem from '../components/ListItem';
-import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/dist/MaterialIcons';
+import RNFetchBlob from 'rn-fetch-blob';
+import RNFS from 'react-native-fs';
+
+import ListItem from '../components/ListItem';
 import Header from '../components/Header';
+
 import {STYLE} from '../styles';
 
 export default function HomeScreen({navigation}) {
@@ -30,9 +35,40 @@ export default function HomeScreen({navigation}) {
     },
   ];
   const [overlay, toggleOverlay] = useState(false);
+  const [notebookName, setNotebookName] = useState('');
+  const dirs = RNFetchBlob.fs.dirs;
   const handleOverlay = () => {
     toggleOverlay(!overlay);
   };
+  const handleAddNotebook = () => {
+    if (notebookName != '') {
+      mkdir();
+    }
+  };
+  const mkdir = () => {
+    RNFS.mkdir(`${dirs.mainbundledir}/notebooks/${notebookName}`);
+  };
+  useEffect(() => {
+    // check if the notebook folder exists
+    const init = async () => {
+      return await RNFS.exists(`${dirs.MainBundleDir}/notebooks`);
+    };
+    const read = async () => {
+      // adding /notebooks messed things ups TODO: FIX
+      await RNFS.readDir(`${dirs.MainBundleDir}/notebooks`).then(f =>
+        f.forEach(elem => console.log(elem)),
+      );
+    };
+
+    // if notebooks exists, then read, else create and .then(read)
+    init().then(notebookDirExists => {
+      if (!notebookDirExists) {
+        RNFS.mkdir(`${dirs.MainBundleDir}/notebooks`).then(read);
+      } else {
+        read();
+      }
+    });
+  }, []);
   return (
     <View style={STYLE.LAYOUT.homePageView}>
       <View>
@@ -80,9 +116,9 @@ export default function HomeScreen({navigation}) {
             padding: 12,
             backgroundColor: STYLE.PALETTE.offWhite,
           }}>
-          <Input placeholder="Notebook name" />
+          <Input placeholder="Notebook name" onChangeText={setNotebookName} />
           <Divider />
-          <Button title="Add" onPress={() => console.log('brrr')} />
+          <Button title="Add" onPress={handleAddNotebook} />
         </View>
       </Overlay>
       <FAB
