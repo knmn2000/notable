@@ -6,6 +6,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/HomeScreen';
 import RecorderScreen from './src/screens/RecorderScreen';
+import PageScreen from './src/screens/PageScreen';
 // import reactNativeUpiPayment from 'react-native-upi-payment';
 
 const Stack = createNativeStackNavigator();
@@ -15,6 +16,17 @@ const Options = {
 };
 
 const App = () => {
+  /*
+  how to setup notebooks and pages:
+  1 
+    set up pseudo directories and sub directories which point to the files that are contained within them
+    this way, in the actual storage, there will only be a single directory containing all the audio files, but 
+    on the app, it looks like things are segregated. the segregation logic will be handled based on file name
+    like : notebookName_pageName.mp3
+    (easier)
+  2
+    actually have directories and subdirectories and list out the files within them (cleaner and logical, but is it required?)
+  */
   return (
     <SafeAreaView style={STYLE.LAYOUT.safeArea}>
       <StatusBar animated={true} barStyle="dark-content" />
@@ -24,6 +36,11 @@ const App = () => {
             <Stack.Screen
               name="HomeScreen"
               component={HomeScreen}
+              options={Options}
+            />
+            <Stack.Screen
+              name="PageScreen"
+              component={PageScreen}
               options={Options}
             />
             <Stack.Screen

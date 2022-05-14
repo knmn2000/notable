@@ -18,12 +18,14 @@ import {
 } from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 
-const RecorderScreen = props => {
+const RecorderScreen = ({route, navigation}) => {
+  const {pageName, notebookName} = route.params;
   const screenWidth = Dimensions.get('screen').width;
   const dirs = RNFetchBlob.fs.dirs;
   const path = Platform.select({
-    ios: 'hello.m4a',
-    android: `${dirs.MainBundleDir}/hello.mp3`,
+    ios: `${pageName}.m4a`,
+    // use rn-fs to check if "await RNFS.exist(filepath)", else create file path
+    android: `${dirs.mainbundledir}/${notebookname}/${pagename}/${pageName}.mp3`,
   });
   const [audioRecorderPlayer, setAudioRecorderPlayer] = useState();
   useMemo(() => {
@@ -115,7 +117,7 @@ const RecorderScreen = props => {
     // );
 
     //? Default path
-    const uri = await audioRecorderPlayer.startRecorder(path.android, audioSet);
+    const uri = await audioRecorderPlayer.startRecorder(path, audioSet);
 
     audioRecorderPlayer.addRecordBackListener(e => {
       console.log('record-back', e);
@@ -153,7 +155,7 @@ const RecorderScreen = props => {
     // const msg = await audioRecorderPlayer.startPlayer(path);
 
     //? Default path
-    const msg = await audioRecorderPlayer.startPlayer(path.android);
+    const msg = await audioRecorderPlayer.startPlayer(path);
     const volume = await audioRecorderPlayer.setVolume(1.0);
     console.log(`file: ${msg}`, `volume: ${volume}`);
 

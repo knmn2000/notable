@@ -32,6 +32,10 @@ const LAYOUT = StyleSheet.create({
   bottomCenterAlign: {
     margin: 24,
   },
+  bottomLeftAlign: {
+    margin: 24,
+    alignSelf: 'flex-end',
+  },
   homePageView: {
     display: 'flex',
     flexDirection: 'column',
