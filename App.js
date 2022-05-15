@@ -1,5 +1,5 @@
 import React from 'react';
-import {SafeAreaView, StatusBar} from 'react-native';
+import {SafeAreaView, StatusBar, LogBox} from 'react-native';
 import {STYLE} from './src/styles';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
@@ -27,6 +27,11 @@ const App = () => {
   2
     actually have directories and subdirectories and list out the files within them (cleaner and logical, but is it required?)
   */
+  LogBox.ignoreLogs([
+    'Remote debugger is in a background tab which may cause apps to perform slowly',
+    'Require cycle: node_modules/rn-fetch-blob/index.js',
+    'Require cycle: node_modules/react-native/Libraries/Network/fetch.js',
+  ]);
   return (
     <SafeAreaView style={STYLE.LAYOUT.safeArea}>
       <StatusBar animated={true} barStyle="dark-content" />

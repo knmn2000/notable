@@ -17,15 +17,15 @@ import {
   View,
 } from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
+import {NOTEBOOKS_PATH} from '../constants';
 
 const RecorderScreen = ({route, navigation}) => {
   const {pageName, notebookName} = route.params;
   const screenWidth = Dimensions.get('screen').width;
-  const dirs = RNFetchBlob.fs.dirs;
   const path = Platform.select({
     ios: `${pageName}.m4a`,
     // use rn-fs to check if "await RNFS.exist(filepath)", else create file path
-    android: `${dirs.MainBundleDir}/notebooks/${notebookname}/${pageName}.mp3`,
+    android: `${NOTEBOOKS_PATH}/notebooks/${notebookName}/${pageName}`,
   });
   const [audioRecorderPlayer, setAudioRecorderPlayer] = useState();
   useMemo(() => {
@@ -40,6 +40,7 @@ const RecorderScreen = ({route, navigation}) => {
     playTime: '00:00:00',
     duration: '00:00:00',
   });
+  useEffect(() => {}, []);
   useEffect(() => {
     audioRecorderPlayer.setSubscriptionDuration(0.1);
   }, [audioRecorderPlayer]);
