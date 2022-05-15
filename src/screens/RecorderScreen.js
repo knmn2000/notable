@@ -25,7 +25,7 @@ const RecorderScreen = ({route, navigation}) => {
   const path = Platform.select({
     ios: `${pageName}.m4a`,
     // use rn-fs to check if "await RNFS.exist(filepath)", else create file path
-    android: `${dirs.MainBundleDir}/${notebookname}/${pagename}/${pageName}.mp3`,
+    android: `${dirs.MainBundleDir}/notebooks/${notebookname}/${pageName}.mp3`,
   });
   const [audioRecorderPlayer, setAudioRecorderPlayer] = useState();
   useMemo(() => {

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, Pressable} from 'react-native';
+import {View, Text, Pressable, PermissionsAndroid} from 'react-native';
 
 import {FAB, Input, Button, BottomSheet, Overlay, Divider} from '@rneui/base';
 import Icon from 'react-native-vector-icons/dist/MaterialIcons';
@@ -10,65 +10,68 @@ import ListItem from '../components/ListItem';
 import Header from '../components/Header';
 
 import {STYLE} from '../styles';
+import {NOTEBOOKS_PATH} from '../constants';
 
 export default function HomeScreen({navigation}) {
-  const list = [
-    {
-      name: 'Bio',
-      subtitle: 'Created: 11-04-21',
-    },
-    {
-      name: 'Physics notes',
-      subtitle: 'Created: Last night',
-    },
-    {
-      name: 'Music theory',
-      subtitle: 'Created: 11-04-21',
-    },
-    {
-      name: 'ideas',
-      subtitle: 'Created: 11-04-21',
-    },
-    {
-      name: 'stock market',
-      subtitle: 'Created: 11-04-21',
-    },
-  ];
+  const [list, setList] = useState([]);
   const [overlay, toggleOverlay] = useState(false);
   const [notebookName, setNotebookName] = useState('');
-  const dirs = RNFetchBlob.fs.dirs;
   const handleOverlay = () => {
     toggleOverlay(!overlay);
+  };
+  const mkdir = async () => {
+    try {
+      await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      ).then(() => {
+        RNFS.mkdir(`${NOTEBOOKS_PATH}/notebooks/${notebookName}`);
+        toggleOverlay(false);
+      });
+    } catch (error) {
+      //TODO: add error message
+      console.log(error);
+    }
   };
   const handleAddNotebook = () => {
     if (notebookName != '') {
       mkdir();
     }
   };
-  const mkdir = () => {
-    RNFS.mkdir(`${dirs.mainbundledir}/notebooks/${notebookName}`);
+
+  const read = async () => {
+    // adding /notebooks messed things ups TODO: FIX
+    await RNFS.readDir(`${NOTEBOOKS_PATH}/notebooks`).then(f => {
+      let narray = [];
+      f.forEach(notebook => {
+        if (notebook.isDirectory()) {
+          const name = notebook.name;
+          console.log(name);
+          const created = new Date(notebook.mtime).toLocaleString();
+          narray.push({name, subtitle: created});
+        }
+      });
+      // Sorting by date created
+      narray.sort(function (a, b) {
+        return new Date(b.subtitle) - new Date(a.subtitle);
+      });
+      setList(narray);
+    });
   };
+
   useEffect(() => {
     // check if the notebook folder exists
     const init = async () => {
-      return await RNFS.exists(`${dirs.MainBundleDir}/notebooks`);
+      return await RNFS.exists(`${NOTEBOOKS_PATH}/notebooks`);
     };
-    const read = async () => {
-      // adding /notebooks messed things ups TODO: FIX
-      await RNFS.readDir(`${dirs.MainBundleDir}/notebooks`).then(f =>
-        f.forEach(elem => console.log(elem)),
-      );
-    };
-
     // if notebooks exists, then read, else create and .then(read)
     init().then(notebookDirExists => {
       if (!notebookDirExists) {
-        RNFS.mkdir(`${dirs.MainBundleDir}/notebooks`).then(read);
+        RNFS.mkdir(`${NOTEBOOKS_PATH}/notebooks`).then(read);
       } else {
         read();
       }
     });
-  }, []);
+  }, [overlay]);
   return (
     <View style={STYLE.LAYOUT.homePageView}>
       <View>
