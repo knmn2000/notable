@@ -5,23 +5,25 @@ import AudioRecorderPlayer, {
   AudioEncoderAndroidType,
   AudioSourceAndroidType,
 } from 'react-native-audio-recorder-player';
+import {Button} from '@rneui/base';
 import {
   Dimensions,
   Platform,
   PermissionsAndroid,
   SafeAreaView,
   StyleSheet,
-  Button,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import RNFetchBlob from 'rn-fetch-blob';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {NOTEBOOKS_PATH} from '../constants';
+import {STYLE} from '../styles';
 
 const RecorderScreen = ({route, navigation}) => {
   const {pageName, notebookName} = route.params;
   const screenWidth = Dimensions.get('screen').width;
+  const [isPlaying, setIsPlaying] = useState(false);
   const path = Platform.select({
     ios: `${pageName}.m4a`,
     // use rn-fs to check if "await RNFS.exist(filepath)", else create file path
@@ -40,7 +42,6 @@ const RecorderScreen = ({route, navigation}) => {
     playTime: '00:00:00',
     duration: '00:00:00',
   });
-  useEffect(() => {}, []);
   useEffect(() => {
     audioRecorderPlayer.setSubscriptionDuration(0.1);
   }, [audioRecorderPlayer]);
@@ -70,6 +71,17 @@ const RecorderScreen = ({route, navigation}) => {
       audioRecorderPlayer.seekToPlayer(subSecs);
       console.log(`subSecs: ${subSecs}`);
     }
+  };
+
+  const goBackward = async () => {
+    const currentPosition = Math.round(playerState.currentPositionSec);
+    const timestamp = Math.round(currentPosition - 5000);
+    audioRecorderPlayer.seekToPlayer(timestamp);
+  };
+  const goForward = async () => {
+    const currentPosition = Math.round(playerState.currentPositionSec);
+    const timestamp = Math.round(currentPosition + 5000);
+    audioRecorderPlayer.seekToPlayer(timestamp);
   };
 
   const onStartRecord = async () => {
@@ -156,6 +168,8 @@ const RecorderScreen = ({route, navigation}) => {
     // const msg = await audioRecorderPlayer.startPlayer(path);
 
     //? Default path
+
+    setIsPlaying(true);
     const msg = await audioRecorderPlayer.startPlayer(path);
     const volume = await audioRecorderPlayer.setVolume(1.0);
     console.log(`file: ${msg}`, `volume: ${volume}`);
@@ -172,6 +186,7 @@ const RecorderScreen = ({route, navigation}) => {
   };
 
   const onPausePlay = async () => {
+    setIsPlaying(false);
     await audioRecorderPlayer.pausePlayer();
   };
 
@@ -180,23 +195,17 @@ const RecorderScreen = ({route, navigation}) => {
   };
 
   const onStopPlay = async () => {
+    setIsPlaying(false);
     console.log('onStopPlay');
     audioRecorderPlayer.stopPlayer();
     audioRecorderPlayer.removePlayBackListener();
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.titleTxt}>Audio Recorder Player</Text>
+      <Text style={styles.titleTxt}>{route.params.pageName}</Text>
       <Text style={styles.txtRecordCounter}>{playerState.recordTime}</Text>
       <View style={styles.viewRecorder}>
-        <View style={styles.recordBtnWrapper}>
-          <Button
-            style={styles.btn}
-            onPress={onStartRecord}
-            title="record"
-            textStyle={styles.txt}
-          />
-          <Button
+        {/* <Button
             style={[
               styles.btn,
               {
@@ -223,8 +232,7 @@ const RecorderScreen = ({route, navigation}) => {
             onPress={onStopRecord}
             title="stop"
             textStyle={styles.txt}
-          />
-        </View>
+          /> */}
       </View>
       <View style={styles.viewPlayer}>
         <TouchableOpacity style={styles.viewBarWrapper} onPress={onStatusPress}>
@@ -237,12 +245,18 @@ const RecorderScreen = ({route, navigation}) => {
         </Text>
         <View style={styles.playBtnWrapper}>
           <Button
-            style={styles.btn}
+            containerStyle={styles.btn}
+            onPress={onStartRecord}
+            title="record"
+            textStyle={styles.txt}
+          />
+          <Button
+            containerStyle={styles.btn}
             onPress={onStartPlay}
             title="play"
             textStyle={styles.txt}
           />
-          <Button
+          {/* <Button
             style={[
               styles.btn,
               {
@@ -274,6 +288,83 @@ const RecorderScreen = ({route, navigation}) => {
             onPress={onStopPlay}
             title="stop"
             textStyle={styles.txt}
+          /> */}
+        </View>
+        <View style={styles.playBtnWrapper}>
+          <Button
+            buttonStyle={{
+              borderRadius: 85,
+              padding: 8,
+              backgroundColor: STYLE.PALETTE.offWhite,
+              borderColor: STYLE.PALETTE.offBlack,
+              borderWidth: 2,
+            }}
+            onPress={goBackward}
+            icon={
+              <Icon
+                name="backward"
+                style={{padding: 10}}
+                size={35}
+                color="black"
+              />
+            }
+          />
+          {isPlaying ? (
+            <Button
+              buttonStyle={{
+                borderRadius: 85,
+                padding: 8,
+                backgroundColor: STYLE.PALETTE.offWhite,
+                borderColor: STYLE.PALETTE.offBlack,
+                borderWidth: 2,
+              }}
+              onPress={onPausePlay}
+              icon={
+                <Icon
+                  name="stop"
+                  style={{padding: 10}}
+                  size={35}
+                  color="black"
+                />
+              }
+            />
+          ) : (
+            <Button
+              buttonStyle={{
+                borderRadius: 85,
+                padding: 8,
+                backgroundColor: STYLE.PALETTE.offWhite,
+                borderColor: STYLE.PALETTE.offBlack,
+                borderWidth: 2,
+              }}
+              onPress={onStartPlay}
+              icon={
+                <Icon
+                  name="play"
+                  style={{padding: 10}}
+                  size={35}
+                  color="black"
+                />
+              }
+            />
+          )}
+          <Button
+            buttonStyle={{
+              borderRadius: 85,
+              padding: 8,
+              backgroundColor: STYLE.PALETTE.offWhite,
+              borderColor: STYLE.PALETTE.offBlack,
+              borderWidth: 2,
+            }}
+            onPress={goForward}
+            icon={
+              <Icon
+                name="forward"
+                style={{padding: 10}}
+                size={35}
+                color="black"
+              />
+            }
           />
         </View>
       </View>
@@ -284,13 +375,13 @@ const RecorderScreen = ({route, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#455A64',
+    backgroundColor: STYLE.PALETTE.offWhite,
     flexDirection: 'column',
     alignItems: 'center',
   },
   titleTxt: {
     marginTop: 100,
-    color: 'white',
+    color: STYLE.PALETTE.offBlack,
     fontSize: 28,
   },
   viewRecorder: {
@@ -328,20 +419,24 @@ const styles = StyleSheet.create({
   playBtnWrapper: {
     flexDirection: 'row',
     marginTop: 40,
+    width: '70%',
+    justifyContent: 'space-between',
+    display: 'flex',
   },
   btn: {
     borderColor: 'white',
     borderWidth: 1,
+    margin: 14,
   },
   txt: {
-    color: 'white',
+    color: STYLE.PALETTE.offBlack,
     fontSize: 14,
     marginHorizontal: 8,
     marginVertical: 4,
   },
   txtRecordCounter: {
     marginTop: 32,
-    color: 'white',
+    color: STYLE.PALETTE.offBlack,
     fontSize: 20,
     textAlignVertical: 'center',
     fontWeight: '200',
@@ -350,7 +445,7 @@ const styles = StyleSheet.create({
   },
   txtCounter: {
     marginTop: 12,
-    color: 'white',
+    color: STYLE.PALETTE.offBlack,
     fontSize: 20,
     textAlignVertical: 'center',
     fontWeight: '200',
