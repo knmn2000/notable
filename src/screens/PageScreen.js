@@ -20,19 +20,20 @@ export default function PageScreen({route, navigation}) {
     navigation.navigate('RecorderScreen', {
       pageName,
       notebookName: route.params.notebookName,
+      sectionName:  route.params.sectionName,
     });
   };
   const read = async () => {
     // adding /notebooks messed things ups TODO: FIX
     await RNFS.readDir(
-      `${NOTEBOOKS_PATH}/notebooks/${route.params.notebookName}`,
+      `${NOTEBOOKS_PATH}/notebooks/${route.params.notebookName}/${route.params.sectionName}`,
     ).then(f => {
-      console.log(`${NOTEBOOKS_PATH}/notebooks/${route.params.notebookName}`);
-      console.log(f);
+      // console.log(`${NOTEBOOKS_PATH}/notebooks/${route.params.notebookName}/${route.params.sectionName}`);
+      // console.log(f);
       let narray = [];
       f.forEach(notebook => {
         const name = notebook.name;
-        console.log(name);
+        // console.log(name);
         const created = new Date(notebook.mtime).toLocaleString();
         narray.push({name, subtitle: created});
       });
@@ -45,6 +46,13 @@ export default function PageScreen({route, navigation}) {
   };
 
   useEffect(() => {
+    navigation.addListener('focus', 
+      ()=>{
+        console.log("brr")
+        read();
+      } 
+    )
+      console.log("brr2")
     read();
   }, [overlay]);
   return (
@@ -59,6 +67,7 @@ export default function PageScreen({route, navigation}) {
                 onPress={() =>
                   navigation.navigate('RecorderScreen', {
                     pageName: l.name,
+                    sectionName: route.params.sectionName,
                     notebookName: route.params.notebookName,
                   })
                 }>

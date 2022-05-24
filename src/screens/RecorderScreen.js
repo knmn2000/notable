@@ -21,13 +21,13 @@ import {NOTEBOOKS_PATH} from '../constants';
 import {STYLE} from '../styles';
 
 const RecorderScreen = ({route, navigation}) => {
-  const {pageName, notebookName} = route.params;
+  const {pageName, notebookName, sectionName} = route.params;
   const screenWidth = Dimensions.get('screen').width;
   const [isPlaying, setIsPlaying] = useState(false);
   const path = Platform.select({
     ios: `${pageName}.m4a`,
     // use rn-fs to check if "await RNFS.exist(filepath)", else create file path
-    android: `${NOTEBOOKS_PATH}/notebooks/${notebookName}/${pageName}`,
+    android: `${NOTEBOOKS_PATH}/notebooks/${notebookName}/${sectionName}/${pageName}`,
   });
   const [audioRecorderPlayer, setAudioRecorderPlayer] = useState();
   useMemo(() => {
@@ -42,9 +42,6 @@ const RecorderScreen = ({route, navigation}) => {
     playTime: '00:00:00',
     duration: '00:00:00',
   });
-  useEffect(() => {
-    audioRecorderPlayer.setSubscriptionDuration(0.1);
-  }, [audioRecorderPlayer]);
   let playWidth =
     (playerState.currentPositionSec / playerState.currentDurationSec) *
     (screenWidth - 56);
@@ -200,12 +197,18 @@ const RecorderScreen = ({route, navigation}) => {
     audioRecorderPlayer.stopPlayer();
     audioRecorderPlayer.removePlayBackListener();
   };
+  useEffect(() => {
+    audioRecorderPlayer.setSubscriptionDuration(0.1);
+    return () => {
+      onStopPlay();
+    }
+  }, [audioRecorderPlayer]);
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.titleTxt}>{route.params.pageName}</Text>
       <Text style={styles.txtRecordCounter}>{playerState.recordTime}</Text>
       <View style={styles.viewRecorder}>
-        {/* <Button
+        <Button
             style={[
               styles.btn,
               {
@@ -232,7 +235,7 @@ const RecorderScreen = ({route, navigation}) => {
             onPress={onStopRecord}
             title="stop"
             textStyle={styles.txt}
-          /> */}
+          />
       </View>
       <View style={styles.viewPlayer}>
         <TouchableOpacity style={styles.viewBarWrapper} onPress={onStatusPress}>

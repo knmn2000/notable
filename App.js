@@ -7,6 +7,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/HomeScreen';
 import RecorderScreen from './src/screens/RecorderScreen';
 import PageScreen from './src/screens/PageScreen';
+import SectionScreen from './src/screens/SectionScreen';
 // import reactNativeUpiPayment from 'react-native-upi-payment';
 
 const Stack = createNativeStackNavigator();
@@ -41,6 +42,11 @@ const App = () => {
             <Stack.Screen
               name="HomeScreen"
               component={HomeScreen}
+              options={Options}
+            />
+            <Stack.Screen
+              name="SectionScreen"
+              component={SectionScreen}
               options={Options}
             />
             <Stack.Screen

@@ -1,5 +1,6 @@
 import {View, Text} from 'react-native';
 import React from 'react';
+import Icon from 'react-native-vector-icons/dist/MaterialIcons';
 
 export default function ListItem({title, subtitle}) {
   return (
@@ -17,7 +18,7 @@ export default function ListItem({title, subtitle}) {
           <Text style={{color: 'black', fontSize: 16}}>{subtitle}</Text>
         </View>
         <View style={{alignContent: 'flex-end'}}>
-          <Text style={{color: 'black', fontSize: 12}}>chevron</Text>
+          <Icon name="chevron-right" color="black" size={24}/>
         </View>
       </View>
     </View>

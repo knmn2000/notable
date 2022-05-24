@@ -12,10 +12,10 @@ import Header from '../components/Header';
 import {STYLE} from '../styles';
 import {NOTEBOOKS_PATH} from '../constants';
 
-export default function HomeScreen({navigation}) {
+export default function HomeScreen({navigation, route}) {
   const [list, setList] = useState([]);
   const [overlay, toggleOverlay] = useState(false);
-  const [notebookName, setNotebookName] = useState('');
+  const [sectionName, setSectionName] = useState('');
   const handleOverlay = () => {
     toggleOverlay(!overlay);
   };
@@ -24,7 +24,7 @@ export default function HomeScreen({navigation}) {
       await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
       ).then(() => {
-        RNFS.mkdir(`${NOTEBOOKS_PATH}/notebooks/${notebookName}`);
+        RNFS.mkdir(`${NOTEBOOKS_PATH}/notebooks/${route.params.notebookName}/${sectionName}`);
         toggleOverlay(false);
       });
     } catch (error) {
@@ -32,21 +32,21 @@ export default function HomeScreen({navigation}) {
       console.log(error);
     }
   };
-  const handleAddNotebook = () => {
-    if (notebookName != '') {
+  const handleAddSection= () => {
+    if (sectionName!= '') {
       mkdir();
     }
   };
 
   const read = async () => {
     // adding /notebooks messed things ups TODO: FIX
-    await RNFS.readDir(`${NOTEBOOKS_PATH}/notebooks`).then(f => {
+    await RNFS.readDir(`${NOTEBOOKS_PATH}/notebooks/${route.params.notebookName}`).then(f => {
       let narray = [];
-      f.forEach(notebook => {
-        if (notebook.isDirectory()) {
-          const name = notebook.name;
+      f.forEach(section=> {
+        if (section.isDirectory()) {
+          const name = section.name;
           console.log(name);
-          const created = new Date(notebook.mtime).toLocaleString();
+          const created = new Date(section.mtime).toLocaleString();
           narray.push({name, subtitle: created});
         }
       });
@@ -59,29 +59,18 @@ export default function HomeScreen({navigation}) {
   };
 
   useEffect(() => {
-    // check if the notebook folder exists
-    const init = async () => {
-      return await RNFS.exists(`${NOTEBOOKS_PATH}/notebooks`);
-    };
-    // if notebooks exists, then read, else create and .then(read)
-    init().then(notebookDirExists => {
-      if (!notebookDirExists) {
-        RNFS.mkdir(`${NOTEBOOKS_PATH}/notebooks`).then(read);
-      } else {
-        read();
-      }
-    });
+    read();
   }, [overlay]);
   return (
     <View style={STYLE.LAYOUT.homePageView}>
       <View>
-        <Header headerText="Notebooks" />
+        <Header headerText="Sections" />
         <View style={{padding: 8, margin: 8}}>
           {list.map((l, i) => (
             <Pressable
               key={i}
               onPress={() =>
-                navigation.navigate('SectionScreen', {notebookName: l.name})
+                navigation.navigate('PageScreen', {notebookName: route.params.notebookName, sectionName: l.name})
               }>
               {/* TODO: https://github.com/jemise111/react-native-swipe-list-view */}
               <ListItem
@@ -91,10 +80,10 @@ export default function HomeScreen({navigation}) {
                 titleStyle={{color: 'black', fontWeight: 'bold', margin: 4}}
                 subtitle={l.subtitle}
                 bottomDivider
-                chevron
               />
             </Pressable>
           ))}
+          {list.length == 0 && <Text style={{color: 'black'}}>Khali hai</Text>}
         </View>
       </View>
       <Overlay
@@ -119,9 +108,9 @@ export default function HomeScreen({navigation}) {
             padding: 12,
             backgroundColor: STYLE.PALETTE.offWhite,
           }}>
-          <Input placeholder="Notebook name" onChangeText={setNotebookName} />
+          <Input placeholder="Section name" onChangeText={setSectionName} />
           <Divider />
-          <Button title="Add" onPress={handleAddNotebook} />
+          <Button title="Add" onPress={handleAddSection} />
         </View>
       </Overlay>
       <FAB
