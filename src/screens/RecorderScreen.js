@@ -20,6 +20,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {NOTEBOOKS_PATH} from '../constants';
 import {STYLE} from '../styles';
 
+// TODO: show error when trying to play an empty file/recording
+// RECORDING KE LIYE NICE NICE UI BANANA HAI
+
 const RecorderScreen = ({route, navigation}) => {
   const {pageName, notebookName, sectionName} = route.params;
   const screenWidth = Dimensions.get('screen').width;

@@ -36,6 +36,15 @@ const LAYOUT = StyleSheet.create({
     margin: 24,
     alignSelf: 'flex-end',
   },
+  bottomLeftAlignAbsolute:{
+    width: 60,  
+    height: 60,   
+    borderRadius: 30,            
+    position: 'absolute',                                          
+    padding: 16,
+    bottom: 20,                                                    
+    right: 16, 
+  },
   homePageView: {
     display: 'flex',
     flexDirection: 'column',

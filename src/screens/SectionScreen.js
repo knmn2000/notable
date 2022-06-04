@@ -114,7 +114,7 @@ export default function HomeScreen({navigation, route}) {
         </View>
       </Overlay>
       <FAB
-        style={STYLE.LAYOUT.bottomLeftAlign}
+        style={STYLE.LAYOUT.bottomLeftAlignAbsolute}
         icon={<Icon name="add" size={24} color="#fff" />}
         color={STYLE.PALETTE.darkBlue}
         // TODO: Add new notebook functionality

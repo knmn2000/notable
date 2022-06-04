@@ -1,4 +1,4 @@
-import {View, Text, Pressable} from 'react-native';
+import {View, Text,SafeAreaView, Pressable, FlatList} from 'react-native';
 import {FAB, Input, Button, BottomSheet, Overlay, Divider} from '@rneui/base';
 import ListItem from '../components/ListItem';
 import React, {useState, useEffect} from 'react';
@@ -8,6 +8,10 @@ import {STYLE} from '../styles';
 import RNFS from 'react-native-fs';
 import {NOTEBOOKS_PATH} from '../constants';
 
+
+// TODO: - MOVE THE PLAYING LOGIC TO A BOTTOM SHEET ON THE PAGES screen.
+//         reserve the recorder screen for recording.
+//       - PLAY ALL
 export default function PageScreen({route, navigation}) {
   const [list, setList] = useState([]);
   const [overlay, toggleOverlay] = useState(false);
@@ -55,35 +59,35 @@ export default function PageScreen({route, navigation}) {
       console.log("brr2")
     read();
   }, [overlay]);
+
+  const PressableItem = ({item})=>(
+    <Pressable
+      onPress={() =>
+        navigation.navigate('RecorderScreen', {
+          pageName: item.name,
+          sectionName: route.params.sectionName,
+          notebookName: route.params.notebookName,
+        })
+      }>
+      <ListItem
+        title={item.name}
+        containerStyle={{margin: 4, height: 80}}
+        titleStyle={{color: 'black', fontWeight: 'bold', margin: 4}}
+        subtitle={item.subtitle}
+        bottomDivider
+        chevron
+      />
+    </Pressable>
+  )
   return (
-    <View style={STYLE.LAYOUT.homePageView}>
-      <View>
-        <Header headerText="Pages" />
-        <View style={{padding: 8, margin: 8}}>
-          {list.length != 0 &&
-            list.map((l, i) => (
-              <Pressable
-                key={i}
-                onPress={() =>
-                  navigation.navigate('RecorderScreen', {
-                    pageName: l.name,
-                    sectionName: route.params.sectionName,
-                    notebookName: route.params.notebookName,
-                  })
-                }>
-                <ListItem
-                  key={i}
-                  title={l.name}
-                  containerStyle={{margin: 4, height: 80}}
-                  titleStyle={{color: 'black', fontWeight: 'bold', margin: 4}}
-                  subtitle={l.subtitle}
-                  bottomDivider
-                  chevron
-                />
-              </Pressable>
-            ))}
-          {list.length == 0 && <Text style={{color: 'black'}}>Khali hai</Text>}
-        </View>
+    <SafeAreaView style={STYLE.LAYOUT.homePageView}>
+      <Header headerText="Pages" />
+      <View style={{flex: 1}}>
+        <FlatList style={{padding: 8, margin: 8}}
+          data={list}
+          renderItem={PressableItem}
+          keyExtractor={item => item.name}
+          />
       </View>
       <Overlay
         isVisible={overlay}
@@ -113,12 +117,12 @@ export default function PageScreen({route, navigation}) {
         </View>
       </Overlay>
       <FAB
-        style={STYLE.LAYOUT.bottomLeftAlign}
+        style={STYLE.LAYOUT.bottomLeftAlignAbsolute}
         icon={<Icon name="add" size={24} color="#fff" />}
         color={STYLE.PALETTE.darkBlue}
         // TODO: Add new page functionality
         onPress={handleOverlay}
       />
-    </View>
+    </SafeAreaView>
   );
 }

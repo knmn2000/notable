@@ -12,6 +12,8 @@ import Header from '../components/Header';
 import {STYLE} from '../styles';
 import {NOTEBOOKS_PATH} from '../constants';
 
+// TODO: implement delete
+
 export default function HomeScreen({navigation}) {
   const [list, setList] = useState([]);
   const [overlay, toggleOverlay] = useState(false);
@@ -125,7 +127,7 @@ export default function HomeScreen({navigation}) {
         </View>
       </Overlay>
       <FAB
-        style={STYLE.LAYOUT.bottomLeftAlign}
+        style={STYLE.LAYOUT.bottomLeftAlignAbsolute}
         icon={<Icon name="add" size={24} color="#fff" />}
         color={STYLE.PALETTE.darkBlue}
         // TODO: Add new notebook functionality

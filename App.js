@@ -32,6 +32,7 @@ const App = () => {
     'Remote debugger is in a background tab which may cause apps to perform slowly',
     'Require cycle: node_modules/rn-fetch-blob/index.js',
     'Require cycle: node_modules/react-native/Libraries/Network/fetch.js',
+    'Require cycle',
   ]);
   return (
     <SafeAreaView style={STYLE.LAYOUT.safeArea}>
