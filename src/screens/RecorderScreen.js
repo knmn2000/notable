@@ -19,6 +19,8 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {NOTEBOOKS_PATH} from '../constants';
 import {STYLE} from '../styles';
+import PlaybackButtons from '../components/playbackButtons';
+import RecordingButtons from '../components/recordingButtons';
 
 // TODO: show error when trying to play an empty file/recording
 // RECORDING KE LIYE NICE NICE UI BANANA HAI
@@ -27,6 +29,8 @@ const RecorderScreen = ({route, navigation}) => {
   const {pageName, notebookName, sectionName} = route.params;
   const screenWidth = Dimensions.get('screen').width;
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isRecordingPaused, setIsRecordingPaused] = useState(false);
   const path = Platform.select({
     ios: `${pageName}.m4a`,
     // use rn-fs to check if "await RNFS.exist(filepath)", else create file path
@@ -87,6 +91,7 @@ const RecorderScreen = ({route, navigation}) => {
   const onStartRecord = async () => {
     if (Platform.OS === 'android') {
       try {
+        setIsRecording(true);
         const grants = await PermissionsAndroid.requestMultiple([
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
@@ -109,6 +114,7 @@ const RecorderScreen = ({route, navigation}) => {
           return;
         }
       } catch (err) {
+        setIsRecording(false);
         console.warn(err);
         return;
       }
@@ -121,15 +127,6 @@ const RecorderScreen = ({route, navigation}) => {
       AVNumberOfChannelsKeyIOS: 2,
       AVFormatIDKeyIOS: AVEncodingOption.aac,
     };
-
-    console.log('audioSet', audioSet);
-    //? Custom path
-    // const uri = await audioRecorderPlayer.startRecorder(
-    //   path,
-    //   audioSet,
-    // );
-
-    //? Default path
     const uri = await audioRecorderPlayer.startRecorder(path, audioSet);
 
     audioRecorderPlayer.addRecordBackListener(e => {
@@ -148,14 +145,20 @@ const RecorderScreen = ({route, navigation}) => {
       await audioRecorderPlayer.pauseRecorder();
     } catch (err) {
       console.log('pauseRecord', err);
+    } finally {
+      setIsRecording(false);
+      setIsRecordingPaused(true);
     }
   };
 
   const onResumeRecord = async () => {
+    setIsRecording(true);
     await audioRecorderPlayer.resumeRecorder();
   };
 
   const onStopRecord = async () => {
+    setIsRecording(false);
+    setIsRecordingPaused(false);
     const result = await audioRecorderPlayer.stopRecorder();
     audioRecorderPlayer.removeRecordBackListener();
     setPlayerState({...playerState, recordSecs: 0});
@@ -163,12 +166,6 @@ const RecorderScreen = ({route, navigation}) => {
   };
 
   const onStartPlay = async () => {
-    console.log('onStartPlay');
-    //? Custom path
-    // const msg = await audioRecorderPlayer.startPlayer(path);
-
-    //? Default path
-
     setIsPlaying(true);
     const msg = await audioRecorderPlayer.startPlayer(path);
     const volume = await audioRecorderPlayer.setVolume(1.0);
@@ -204,175 +201,38 @@ const RecorderScreen = ({route, navigation}) => {
     audioRecorderPlayer.setSubscriptionDuration(0.1);
     return () => {
       onStopPlay();
-    }
+    };
   }, [audioRecorderPlayer]);
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.titleTxt}>{route.params.pageName}</Text>
+      <Text style={styles.txtRecordCounter}>{isRecording ? 'Recording...' : isRecordingPaused ? 'Paused' : ''}</Text>
       <Text style={styles.txtRecordCounter}>{playerState.recordTime}</Text>
-      <View style={styles.viewRecorder}>
-        <Button
-            style={[
-              styles.btn,
-              {
-                marginLeft: 12,
-              },
-            ]}
-            onPress={onPauseRecord}
-            title="pause"
-            textStyle={styles.txt}
-          />
-          <Button
-            title="resume"
-            style={[
-              styles.btn,
-              {
-                marginLeft: 12,
-              },
-            ]}
-            onPress={onResumeRecord}
-            textStyle={styles.txt}
-          />
-          <Button
-            style={[styles.btn, {marginLeft: 12}]}
-            onPress={onStopRecord}
-            title="stop"
-            textStyle={styles.txt}
-          />
-      </View>
+      {/* playback viewer */}
       <View style={styles.viewPlayer}>
-        <TouchableOpacity style={styles.viewBarWrapper} onPress={onStatusPress}>
+        {/* <TouchableOpacity style={styles.viewBarWrapper} onPress={onStatusPress}>
           <View style={styles.viewBar}>
             <View style={[styles.viewBarPlay, {width: playWidth}]} />
           </View>
         </TouchableOpacity>
         <Text style={styles.txtCounter}>
           {playerState.playTime} / {playerState.duration}
-        </Text>
-        <View style={styles.playBtnWrapper}>
-          <Button
-            containerStyle={styles.btn}
-            onPress={onStartRecord}
-            title="record"
-            textStyle={styles.txt}
-          />
-          <Button
-            containerStyle={styles.btn}
-            onPress={onStartPlay}
-            title="play"
-            textStyle={styles.txt}
-          />
-          {/* <Button
-            style={[
-              styles.btn,
-              {
-                marginLeft: 12,
-              },
-            ]}
-            onPress={onPausePlay}
-            title="pause"
-            textStyle={styles.txt}
-          />
-          <Button
-            style={[
-              styles.btn,
-              {
-                marginLeft: 12,
-              },
-            ]}
-            onPress={onResumePlay}
-            title="resume"
-            textStyle={styles.txt}
-          />
-          <Button
-            style={[
-              styles.btn,
-              {
-                marginLeft: 12,
-              },
-            ]}
-            onPress={onStopPlay}
-            title="stop"
-            textStyle={styles.txt}
-          /> */}
-        </View>
-        <View style={styles.playBtnWrapper}>
-          <Button
-            buttonStyle={{
-              borderRadius: 85,
-              padding: 8,
-              backgroundColor: STYLE.PALETTE.offWhite,
-              borderColor: STYLE.PALETTE.offBlack,
-              borderWidth: 2,
-            }}
-            onPress={goBackward}
-            icon={
-              <Icon
-                name="backward"
-                style={{padding: 10}}
-                size={35}
-                color="black"
-              />
-            }
-          />
-          {isPlaying ? (
-            <Button
-              buttonStyle={{
-                borderRadius: 85,
-                padding: 8,
-                backgroundColor: STYLE.PALETTE.offWhite,
-                borderColor: STYLE.PALETTE.offBlack,
-                borderWidth: 2,
-              }}
-              onPress={onPausePlay}
-              icon={
-                <Icon
-                  name="stop"
-                  style={{padding: 10}}
-                  size={35}
-                  color="black"
-                />
-              }
-            />
-          ) : (
-            <Button
-              buttonStyle={{
-                borderRadius: 85,
-                padding: 8,
-                backgroundColor: STYLE.PALETTE.offWhite,
-                borderColor: STYLE.PALETTE.offBlack,
-                borderWidth: 2,
-              }}
-              onPress={onStartPlay}
-              icon={
-                <Icon
-                  name="play"
-                  style={{padding: 10}}
-                  size={35}
-                  color="black"
-                />
-              }
-            />
-          )}
-          <Button
-            buttonStyle={{
-              borderRadius: 85,
-              padding: 8,
-              backgroundColor: STYLE.PALETTE.offWhite,
-              borderColor: STYLE.PALETTE.offBlack,
-              borderWidth: 2,
-            }}
-            onPress={goForward}
-            icon={
-              <Icon
-                name="forward"
-                style={{padding: 10}}
-                size={35}
-                color="black"
-              />
-            }
-          />
-        </View>
+        </Text> */}
+        <PlaybackButtons
+          isPlaying={isPlaying}
+          goForward={goForward}
+          goBackward={goBackward}
+          onStartPlay={onStartPlay}
+          onPausePlay={onPausePlay}
+        />
+        <RecordingButtons
+          isRecording={isRecording}
+          onStartRecord={onStartRecord}
+          onPauseRecord={onPauseRecord}
+          onResumeRecord={onResumeRecord}
+          onStopRecord={onStopRecord}
+          isRecordingPaused={isRecordingPaused}
+        />
       </View>
     </SafeAreaView>
   );
