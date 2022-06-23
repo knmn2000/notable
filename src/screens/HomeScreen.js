@@ -22,6 +22,7 @@ export default function HomeScreen({navigation}) {
     toggleOverlay(!overlay);
   };
   const mkdir = async () => {
+    console.log()
     try {
       await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,

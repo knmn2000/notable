@@ -206,8 +206,8 @@ const RecorderScreen = ({route, navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.titleTxt}>{route.params.pageName}</Text>
-      <Text style={styles.txtRecordCounter}>{isRecording ? 'Recording...' : isRecordingPaused ? 'Paused' : ''}</Text>
-      <Text style={styles.txtRecordCounter}>{playerState.recordTime}</Text>
+      <Text style={styles.txtRecordStatus}>{isRecording ? 'Recording...' : isRecordingPaused ? 'Paused' : ''}</Text>
+      <Text style={styles.txtRecordTime}>{playerState.recordTime}</Text>
       {/* playback viewer */}
       <View style={styles.viewPlayer}>
         {/* <TouchableOpacity style={styles.viewBarWrapper} onPress={onStatusPress}>
@@ -218,13 +218,13 @@ const RecorderScreen = ({route, navigation}) => {
         <Text style={styles.txtCounter}>
           {playerState.playTime} / {playerState.duration}
         </Text> */}
-        <PlaybackButtons
+        {/* <PlaybackButtons
           isPlaying={isPlaying}
           goForward={goForward}
           goBackward={goBackward}
           onStartPlay={onStartPlay}
           onPausePlay={onPausePlay}
-        />
+        /> */}
         <RecordingButtons
           isRecording={isRecording}
           onStartRecord={onStartRecord}
@@ -246,9 +246,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleTxt: {
-    marginTop: 100,
+    marginTop: 70,
     color: STYLE.PALETTE.offBlack,
-    fontSize: 28,
+    fontSize: 48,
   },
   viewRecorder: {
     marginTop: 40,
@@ -262,6 +262,7 @@ const styles = StyleSheet.create({
     marginTop: 60,
     alignSelf: 'stretch',
     alignItems: 'center',
+    flex: 2,
   },
   viewBarWrapper: {
     marginTop: 28,
@@ -300,12 +301,31 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginVertical: 4,
   },
-  txtRecordCounter: {
+  txtRecordStatus: {
     marginTop: 32,
     color: STYLE.PALETTE.offBlack,
     fontSize: 20,
     textAlignVertical: 'center',
     fontWeight: '200',
+    fontFamily: 'Helvetica Neue',
+    letterSpacing: 3,
+  },
+  txtRecordStatus: {
+    marginTop: 32,
+    color: STYLE.PALETTE.offBlack,
+    fontSize: 20,
+    textAlignVertical: 'center',
+    fontWeight: '200',
+    fontFamily: 'Helvetica Neue',
+    letterSpacing: 3,
+  },
+  txtRecordTime: {
+    marginTop: 82,
+    flex: 3,
+    color: STYLE.PALETTE.offBlack,
+    fontSize: 72,
+    textAlignVertical: 'center',
+    fontWeight: '400',
     fontFamily: 'Helvetica Neue',
     letterSpacing: 3,
   },

@@ -10,10 +10,10 @@ import {
 const styles = StyleSheet.create({
   playBtnWrapper: {
     flexDirection: 'row',
-    marginTop: 40,
-    width: '70%',
-    justifyContent: 'space-between',
-    display: 'flex',
+    width: '90%',
+    justifyContent: 'space-evenly',
+    alignItems:'center',
+    padding: 8,
   },
 });
 
@@ -26,18 +26,15 @@ export default function PlaybackButtons({isPlaying, goBackward, goForward, onSta
         <View style={styles.playBtnWrapper}>
           <Button
             buttonStyle={{
-              borderRadius: 85,
               padding: 8,
               backgroundColor: STYLE.PALETTE.offWhite,
               borderColor: STYLE.PALETTE.offBlack,
-              borderWidth: 2,
             }}
             onPress={goBackward}
             icon={
               <Icon
                 name="backward"
-                style={{padding: 10}}
-                size={35}
+                size={25}
                 color="black"
               />
             }
@@ -45,18 +42,15 @@ export default function PlaybackButtons({isPlaying, goBackward, goForward, onSta
           {isPlaying ? (
             <Button
               buttonStyle={{
-                borderRadius: 85,
                 padding: 8,
                 backgroundColor: STYLE.PALETTE.offWhite,
                 borderColor: STYLE.PALETTE.offBlack,
-                borderWidth: 2,
               }}
               onPress={onPausePlay}
               icon={
                 <Icon
                   name="stop"
-                  style={{padding: 10}}
-                  size={35}
+                  size={25}
                   color="black"
                 />
               }
@@ -64,18 +58,15 @@ export default function PlaybackButtons({isPlaying, goBackward, goForward, onSta
           ) : (
             <Button
               buttonStyle={{
-                borderRadius: 85,
                 padding: 8,
                 backgroundColor: STYLE.PALETTE.offWhite,
                 borderColor: STYLE.PALETTE.offBlack,
-                borderWidth: 2,
               }}
               onPress={onStartPlay}
               icon={
                 <Icon
                   name="play"
-                  style={{padding: 10}}
-                  size={35}
+                  size={25}
                   color="black"
                 />
               }
@@ -83,18 +74,15 @@ export default function PlaybackButtons({isPlaying, goBackward, goForward, onSta
           )}
           <Button
             buttonStyle={{
-              borderRadius: 85,
               padding: 8,
               backgroundColor: STYLE.PALETTE.offWhite,
               borderColor: STYLE.PALETTE.offBlack,
-              borderWidth: 2,
             }}
             onPress={goForward}
             icon={
               <Icon
                 name="forward"
-                style={{padding: 10}}
-                size={35}
+                size={25}
                 color="black"
               />
             }
